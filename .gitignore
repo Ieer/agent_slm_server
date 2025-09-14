@@ -1,0 +1,115 @@
+# ---- Python 基本 ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# 虛擬環境
+.venv/
+venv/
+.env/
+.envrc
+
+# Jupyter / 開發暫存
+.ipynb_checkpoints/
+*.ipynb
+
+# 編譯與封裝產物
+build/
+dist/
+*.egg-info/
+*.egg
+
+# 日誌與暫存
+logs/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# 測試/覆蓋率
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# IDE / 編輯器
+.vscode/
+.idea/
+
+# 型別/靜態分析暫存
+.pyre/
+.pytype/
+
+# 模型與大型檔（建議以 README 指導下載/同步）
+############################################################
+# models 目錄規則
+# 需求：排除整個 models 內容（大型檔案不納入版控），但仍可保留必要 tokenizer/config 等小檔案。
+# 說明：
+# 1. 先忽略 models/* 使所有檔案預設被忽略。
+# 2. 再反向允許資料夾 (/**/) 讓 Git 能追蹤被重新允許的檔案。
+# 3. 針對要保留的小型設定檔加上 ! 規則。
+# 4. 若需要額外追蹤特定檔案，可再補充 ! 規則。
+# 注意：一旦使用 models/* 方式，單純的 !models/**/config.json 仍需要 !models/**/ 先「解鎖」目錄。
+############################################################
+models/*
+!models/**/
+
+# 保留必要設定/詞彙檔 (依實際需要增減)
+!models/**/config.json
+!models/**/tokenizer.json
+!models/**/tokenizer_config.json
+!models/**/special_tokens_map.json
+!models/**/merges.txt
+!models/**/vocab.json
+!models/**/vocab.txt
+!models/**/README.md
+!models/**/added_tokens.json
+
+# （可選）若需要保留量化/自定結構配置檔，可取消註解：
+# !models/**/generation_config.json
+# !models/**/configuration.json
+
+# 典型大型/訓練相關檔案（即使前面 models/* 已忽略，列出可讀性更佳）
+models/**/model.safetensors
+models/**/pytorch_model.bin
+models/**/optimizer.pt
+models/**/training_args.bin
+models/**/scheduler.pt
+
+# 若要保留整個空資料夾，可在該資料夾放置一個 .keep
+
+# 快取文件
+cache/
+*.cache
+
+# 臨時資料輸出
+outputs/
+artifacts/
+checkpoints/
+
+# 環境/私密設定
+*.env
+.env.*
+secrets.*.json
+
+# 視覺化/分析輸出
+wandb/
+mlruns/
+
+# 專案特定：若 embedding 模型可重建，也可忽略其權重
+# models/embedding/*/model.safetensors
+
+# 允許保留 tokenizer/config 小檔案
+!models/**/config.json
+!models/**/tokenizer.json
+!models/**/tokenizer_config.json
+!models/**/special_tokens_map.json
+!models/**/merges.txt
+!models/**/vocab.json
+!models/**/vocab.txt
+
+# Windows PowerShell 可能產生的臨時檔
+*.ps1.tmp

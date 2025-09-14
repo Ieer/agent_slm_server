@@ -1,0 +1,106 @@
+from pydantic_ai impormodel = OpenAIModel("qwen2.5-0.5b-instruct", provider=provider)
+lm_agent = Agent(
+	model,
+	system_prompt="请你调用合适的工具函数完成任务，并用中文回答结果，如果没有适合调用的函数就回复'我无法处理本次任务'。",
+	model_kwargs={"stream": False}  # 明確設定不使用流式返回
+)Context
+from pydantic_ai import Agent
+from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.models.openai import OpenAIModel
+from typing import Any
+import sys
+import requests
+
+# 配置本地 OpenAI 兼容端点
+provider = OpenAIProvider(
+	base_url="http://127.0.0.1:8001/v1",
+	api_key="local"  # 只作佔位
+)
+
+# 簡單健康檢查，避免 APIConnectionError 時才發現服務未啟動
+def _check_api_health(base_url: str) -> bool:
+	try:
+		r = requests.get(base_url.replace("/v1", "") + "/health", timeout=1.5)
+		return r.ok
+	except Exception:
+		return False
+
+model = OpenAIModel("qwen2.5-0.5b-instruct", provider=provider)
+lm_agent = Agent(
+	model,
+	system_prompt="请你调用合适的工具函数完成任务，并用中文回答结果，如果没有适合调用的函数就回复“我无法处理本次任务”。",
+)
+
+# 测试调用
+@lm_agent.tool
+def add_numbers(ctx: RunContext[Any], a: int, b: int) -> int:
+	"""返回两个数字的和"""
+	return (a + b)*2
+
+# 测试调用, 我的名字是小明, 今年10岁, 体重30公斤, 身高1.4米, 你能帮我算算我的BMI吗？
+@lm_agent.tool
+def calculate_bmi(ctx: RunContext[Any], weight_kg: float, height_m: float) -> float:
+	"""计算BMI指数"""
+	if height_m <= 0:
+		return 0.0
+	bmi = weight_kg / (height_m ** 2)
+	return round(bmi, 2)
+
+
+def consume_generator(gen):
+	"""消費生成器並返回合併的文本（對於stream=True模式）"""
+	text_parts = []
+	try:
+		for item in gen:
+			if isinstance(item, str):
+				text_parts.append(item)
+			elif hasattr(item, 'text'):
+				# 可能是GenerationOutput或其他帶text屬性的對象
+				return item
+	except Exception as e:
+		print(f"消費生成器時出錯: {e}")
+	
+	# 如果只收集到字符串片段，則合併它們
+	if text_parts:
+		return ''.join(text_parts)
+	return None
+
+if __name__ == "__main__":
+	api_ok = _check_api_health("http://127.0.0.1:8001/v1")
+	if not api_ok:
+		print("本地 API 尚未啟動，請先執行: python -m uvicorn qwen_api_server:app --host 127.0.0.1 --port 8001")
+		sys.exit(1)
+
+	res3 = lm_agent.run_sync("5 和 7 的和是多少？")
+	# 檢查是否為生成器，如果是則消費它
+	if hasattr(res3.output, '__iter__') and hasattr(res3.output, '__next__'):
+		output = consume_generator(res3.output)
+		if output is not None:
+			# 避免使用.text，而是採用字符串處理
+			if not isinstance(output, str) and hasattr(output, 'text'):
+				print(f"{output.text}")
+			else:
+				print(f"{output}")
+		else:
+			print("(無輸出)")
+	else:
+		print(res3.output)
+	print(res3.usage())
+
+	res4 = lm_agent.run_sync("我的名字是小明, 今年10岁, 体重30公斤,身高1.4米, 你能帮我算算我的BMI吗？")
+	# 檢查是否為生成器，如果是則消費它
+	if hasattr(res4.output, '__iter__') and hasattr(res4.output, '__next__'):
+		output = consume_generator(res4.output)
+		if output is not None:
+			# 避免使用.text，而是採用字符串處理
+			if not isinstance(output, str) and hasattr(output, 'text'):
+				print(f"{output.text}")
+			else:
+				print(f"{output}")
+		else:
+			print("(無輸出)")
+	else:
+		print(res4.output)
+	print(res4.usage())
+	
+

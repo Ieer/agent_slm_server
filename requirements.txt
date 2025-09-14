@@ -1,0 +1,32 @@
+# 核心執行依賴（釘選可再收斂）
+fastapi>=0.95,<1.0
+uvicorn>=0.22,<0.36
+transformers>=4.33.0,<5.0.0
+sentence-transformers>=2.2.2,<3.0.0
+# 預設 CPU 版 Torch；若有 GPU 需手動改對應 index-url
+torch>=2.0.0 --index-url https://download.pytorch.org/whl/cpu
+
+# 可選：量化/優化
+bitsandbytes>=0.41.0
+accelerate>=0.21.0
+
+# 實用工具
+psutil>=5.9
+pydantic>=2.0
+
+# Token 計數（可選）
+tiktoken>=0.7.0
+
+# 監控/串流 (如使用 SSE 可加入)
+sse-starlette>=3.0.0
+
+# 若需要 OpenAI 客戶端相容測試
+openai>=1.0.0
+
+# 若要使用 MODEL_BACKEND=llama.cpp (GGUF) 後端，需要安裝：
+# llama-cpp-python>=0.2.84
+# Windows 若遇到編譯問題，可先嘗試:
+#   pip install --upgrade pip
+#   pip install llama-cpp-python --extra-index-url https://jllllll.github.io/llama-cpp-python-cuBLAS-wheels
+# 或使用官方預編譯 (若已提供)；CPU 版本可直接:
+#   pip install llama-cpp-python
