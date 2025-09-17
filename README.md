@@ -1,4 +1,4 @@
-# Agent SLM Server (原 y26hkx_server) 本地 LLM / OpenAI 相容服務
+# Agent SLM Server 本地 LLM / OpenAI 相容服務
 
 輕量、可本機離線運行的 Qwen 0.5B + 多 embedding 模型 OpenAI 相容 API 服務。
 
